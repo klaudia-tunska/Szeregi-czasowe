@@ -1,0 +1,101 @@
+---
+title: "Analiza szeregu czasowego"
+author: "Magda Kozajda"
+date: "2024-01-09"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r biblioteki}
+library(TSstudio)
+library(forecast)
+library(stats)
+library(astsa)
+```
+
+# Wczytywanie danych do szeregu
+```{r dane}
+data = read.csv('/Users/magda/Desktop/projekt_sc/usa.csv')
+df = as.data.frame(data) 
+time_series = ts(df$HCPI, frequency=4, start = c(1970,1))
+plot(time_series, main = 'Tak wygląda początkowy szereg czasowy')
+```
+
+# Estymacja trendu
+```{r trend}
+# wygładzanie trendu metodą średniej ruchomej 
+ts_filter = stats::filter(time_series, rep(1/5,5))
+
+plot(ts_filter, main = 'Wygładzanie trendu metoda średniej ruchomej')
+lines(time_series, col = 'red')
+
+
+# model trendu liniowego 
+ts_linear_trend = tslm(time_series ~ trend)
+ts_fitted_vals = fitted.values(ts_linear_trend)
+summary(ts_linear_trend)
+
+plot(time_series)
+lines(ts_filter, col='blue')
+lines(ts_fitted_vals, col='red')
+
+# model trendu liniowego - analiza residuow
+res_linear_trend = residuals(ts_linear_trend)
+plot(res_linear_trend)
+qqnorm(res_linear_trend)
+abline(a = 0, b =1, col = 'red')
+shapiro.test(res_linear_trend)
+
+# model trendu wielomianowego 
+poly2 = tslm(time_series ~ trend + poly(trend,2))
+poly4 = tslm(time_series ~ trend + poly(trend,4))
+plot(time_series)
+lines(fitted.values(poly2), col = 'blue')
+lines(fitted.values(poly4),col = 'red')
+
+# regresja nielokalna
+ap = time_series
+
+plot(ts_filter, col = 'red')
+#lines(lowess(ap, f=0.25), type='l')
+#lines(lowess(ap, f=0.15), type='l')
+#lines(lowess(ap, f=0.50), type='l')
+#lines(lowess(ap, f=0.75), type='l')
+lines(lowess(ap, f=0.10), type='l')
+```
+
+# Sezonowość
+```{r sezonowosc}
+ts_trend_seasonality = tslm(time_series ~ trend + season)
+ts_trend_seasonality2 = fitted.values(ts_trend_seasonality)
+
+plot(time_series)
+lines(ts_filter, col='blue')
+lines(fitted.values(ts_linear_trend), col='green')
+lines(ts_trend_seasonality2, col = 'red')
+```
+
+# Transformacja Boxa - Coxa (przeczytac co ona robi)
+```{r boxcox}
+box_cox_trans = BoxCox(time_series,0)
+```
+
+
+# Dobór modelu
+```{r model}
+ts = diff(time_series)
+plot(ts)
+acf(ts) #4
+pacf(ts) #2
+arima(ts, c(2,0,4)) #aic 272
+arima(ts, c(4,0,2)) #263
+arima(ts, c(3,0,2)) #255
+auto.arima(ts) # 101 aic 262
+
+ts2 = arima(ts, c(3,0,2)) 
+sarima(ts, 3,0,2)
+```
+
