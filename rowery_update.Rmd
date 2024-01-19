@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 # Cel biznesowy
 
-Właściciel sklepu z rowerami i częściami rowerowymi mający siedziby w różnych miastach na Dolnym Śląsku zastanawia się , ile towaru ma zamówić przed rozpoczęciem sezonu. W tym celu chce wiedzieć, jakie będzie przyszłe zainteresowanie Dolnoślązaków rowerami. Naszym zadaniem, jako osób zatrudnionych przez właściciela sklepu rowerowego jest prognoza zainteresowania hasłem "rowery" w województwie dolnośląski w okresie najbliższych ????, co przedstawimy w następującym projekcie.
+Właściciel sklepu z rowerami i częściami rowerowymi mający siedziby w różnych miastach na Dolnym Śląsku zastanawia się , ile towaru ma zamówić przed rozpoczęciem sezonu. W tym celu chce wiedzieć, jakie będzie przyszłe zainteresowanie Dolnoślązaków rowerami. Naszym zadaniem, jako osób zatrudnionych przez właściciela sklepu rowerowego jest prognoza zainteresowania hasłem "rowery" w województwie dolnośląski w okresie najbliższych dwóch lat, co przedstawimy w następującym projekcie.
 
 ```{r biblioteki, echo = F}
 library(TSstudio)
