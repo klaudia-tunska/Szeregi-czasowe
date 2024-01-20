@@ -63,12 +63,19 @@ Warte zwrócenia uwagi na pierwszym wykresie jest również to, że w początkow
 
 
 # Dekompozycja 
+
+Dokonam teraz pierwszej dekompozycji naszych danych, za pomocą funkcji decompose.
+
 ```{r decompose}
 dec = decompose(time_series)
 plot(dec)
 ```
+Powyższy wykres składa się z czterech komponentów: surowych danych, trendu, sezonowości oraz reszty, którą otrzymujemy po odjęciu trendu i sezonowości od surowych danych. Trend jest wyraźnie rosnący, natomiast sezonowość przejawia się małymi wartościami na początku roku, które następnie rosną, aż osiągają swoje maksimum około połowy roku, a następnie spadają do bardzo małych wartości na koniec roku. Dokładną analizą trendu i sezonowości zajmujemy się w dalszej części raportu.  
 
 ## Wygładzanie szeregu
+
+Pierwszą czynnością, którą musimy wykonać, przy dekompozycji szeregu czasowego jest wygładzanie, czyli odkrywanie głównej tendencji rozwojowej. Będziemy korzystać z dwóch metod wygładzania szeregu, metody średniej ruchomej oraz regresji nielokalnej.
+
 ```{r wygladzanie}
 # wygładzanie - metoda średniej ruchomej 
 ts_filter = stats::filter(time_series, rep(1/2,2))
