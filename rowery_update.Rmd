@@ -107,6 +107,8 @@ legend("topleft", legend = c('średnia ruchoma', 'regresja nielokalna'), col = c
 ```
 
 ## Trend
+Przeanalizujemy teraz trend przy pomocy kilku różnych metod.
+
 ```{r trend}
 # trend - decompose
 ts_decompose_trend = dec$trend
@@ -143,6 +145,7 @@ trends = data.frame(names, sigmas, rsquares)
 colnames(trends) = c('Metoda estymacji', 'RSE', 'R kwadrat')
 kable(trends, caption = 'Statystyki dla różnych metod estymacji trendu')
 ```
+Na powyższym wykresie widzimy trzy różne metody estymacji trendu metodę trendu wielomianowego z 2 i 4 stopniami, liniowego oraz wcześniej wspomnianą funkcję decompose. Estymację trendu ostatnią metodą bierzemy dla porównania, nie bierzemy jej pod uwagę przy wyborze metody, ponieważ po usunięciu trendu przy pomocy tej metody, nie ma łatwej i oczywistej metody, aby dodać go z powrotem do naszej prognozy. Pozostałe metody porównujemy, analizując ich zachowanie na wykresie oraz wartości RSE i R kwadrat. Metoda trendu liniowego wydaję się być najgorsza w tym przypadku, ma ona największy błąd (RSE) oraz najmniejszą wartość dla współczynnika determinacji (R kwadrat). Metoda trendu wielomianowego w obu przypadkach ma lepsze wartości niż metoda trendu liniowego, na wykresie też wydaję się lepiej dopasowywać do naszych danych. Porównując tę metodę dla różnej ilości stopni widać wyraźnie, że lepsze wartości dostajemy przy 4 stopniach swobody.
 
 ## Sezonowość
 ```{r sezonowosc}
@@ -154,8 +157,12 @@ ts_linear_season_vals = fitted.values(ts_linear_season)
 plot(time_series, main = 'Analiza sezonowości', ylab = 'Ilość wyszukań', xlab = 'Czas')
 lines(ts_linear_season_vals, col = 'red')
 ```
+Sezonowość dla naszego szeregu znajdujemy przy pomocy funkcji tslm, ma ona wyraźnie charakter roczny, gdzie najmniejsze wartości mamy na końcach okresu, a największe mniej więcej na jego środku. Możemy zauważyć, że dostajemy taką samą sezonowość, jak przy użyciu funkcji decompose, o której wspominaliśmy wcześniej. Nie korzystamy z funkcji decompose, z tego samego powodu, co przy estymacji trendu. 
 
 ## Usuwanie trendu i sezonowości
+
+Będziemy teraz usuwać trend i sezonowość, przy pomocy odpowiednio metody wielomianowej i funkcji tslm. Sprawdzimy, czy ma znaczenie, co usuniemy pierwsze.
+
 ```{r dec23}
 #usuwamy trend i sezonowosc
 ts = time_series - poly4_vals
@@ -170,6 +177,7 @@ lines(ts2-trend2, col='green')
 #wniosek: nie ma znaczenia co usuwamy pierwsze
 ```
 
+Wykres wskazuję na to, że nie ma żadnego znaczenia, co usuwamy pierwsze, ponieważ linie dla obu metod pokrywają się na wykresie. 
 
 ## Dekompozycja
 
