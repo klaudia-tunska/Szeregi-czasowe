@@ -57,6 +57,11 @@ plot(year_sum$Year, year_sum$Suma, main = 'Łączna liczba wyszukań dla poszcze
      xlab = 'Rok', ylab='Liczba wyszukań')
 ```
 
+Na powyższym wykresie przedstawiamy surowe dane. Widać na nim wyraźnie, że zainteresowanie hasłem "rowery" przedstawia się w postaci pików, czyli przez na krótkim odcinku czasu wartości gwałtownie rosły, aby potem gwałtownie zmaleć. Potwierdza to również drugi wykres, na którym przedstawiamy, jak zmieniają się wartości w zależności na miesiąc. Widzimy, że największe wartości dostajemy w maju, natomiast najniższe w styczniu i grudniu, w okresie wiosenno-letnim popularność rowerów jest znacząco większa, niż w okresie jesienno-zimowym. Oba wykresy wskazują więc na możliwą sezonowość występującą w naszych danych. 
+
+Warte zwrócenia uwagi na pierwszym wykresie jest również to, że w początkowych okresach, które badamy, maksymalna liczba wyszukiwań nie przekraczała 40, natomiast w późniejszych okresach osiąga wartości maksymalne powyżej 60. Bardzo dobrze widać to na trzecim wykresie, gdzie bierzemy sumę liczby wyszukań w roku. Oba wykresy wskazują więc na możliwy trend występujący w naszych danych. 
+
+
 # Dekompozycja 
 ```{r decompose}
 dec = decompose(time_series)
