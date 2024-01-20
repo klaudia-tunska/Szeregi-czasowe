@@ -1,18 +1,24 @@
 ---
 title: "Analiza szeregu czasowego"
-author: "Magda Kozajda"
+author: "Magda Kozajda, Natalia Majewska, Klaudia Tuńska"
 date: "2024-01-09"
-output: pdf_document
+output: 
+  pdf_document:
+    toc: TRUE
+toc-title: "Spis treści"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+\newpage
+
 # Cel biznesowy
 
 Właściciel sklepu z rowerami i częściami rowerowymi mający siedziby w różnych miastach na Dolnym Śląsku zastanawia się , ile towaru ma zamówić przed rozpoczęciem sezonu. W tym celu chce wiedzieć, jakie będzie przyszłe zainteresowanie Dolnoślązaków rowerami. Naszym zadaniem, jako osób zatrudnionych przez właściciela sklepu rowerowego jest prognoza zainteresowania hasłem "rowery" w województwie dolnośląski w okresie najbliższych dwóch lat, co przedstawimy w następującym projekcie.
 
-```{r biblioteki, echo = F}
+```{r biblioteki, echo = F, warnings=FALSE, message=FALSE, include=FALSE}
 library(TSstudio)
 library(forecast)
 library(stats)
@@ -26,7 +32,7 @@ library(knitr)
 
 Danę, na temat zainteresowania rowerami pozyskujemy ze strony Google Trends. Zawierają one liczbę wyszukiwań hasła "rowery" na Dolnym Śląsku przez przeglądarkę Google każdego miesiąca od stycznia 2004 roku. 
 
-```{r dane}
+```{r dane,echo = F}
 data = read.csv('/Users/magda/Desktop/szeregi_czasowev2/rowery.csv', sep = ';')
 
 df = as.data.frame(data) 
@@ -37,7 +43,7 @@ time_series = ts(df$Number, frequency=12, start = c(2004,1))
 
 Dokonamy, teraz ogólnego przeglądu danych, w celu wyrobienia początkowej intuicji na temat ich zachowania. 
 
-```{r info}
+```{r info,echo = F,fig.align='center', out.width='80%'}
 # Szereg czasowy
 plot(time_series, main = 'Zainteresowanie rowerami w województwie dolnośląskim', xlab ='Czas', ylab= 'Ilość wyszukań')
 
@@ -66,7 +72,7 @@ Warte zwrócenia uwagi na pierwszym wykresie jest również to, że w początkow
 
 Dokonam teraz pierwszej dekompozycji naszych danych, za pomocą funkcji decompose.
 
-```{r decompose}
+```{r decompose,echo = F,fig.align='center', out.width='80%'}
 dec = decompose(time_series)
 plot(dec)
 ```
@@ -76,7 +82,7 @@ Powyższy wykres składa się z czterech komponentów: surowych danych, trendu, 
 
 Pierwszą czynnością, którą musimy wykonać, przy dekompozycji szeregu czasowego jest wygładzanie, czyli odkrywanie głównej tendencji rozwojowej. Będziemy korzystać z dwóch metod wygładzania szeregu, metody średniej ruchomej oraz regresji nielokalnej.
 
-```{r wygladzanie}
+```{r wygladzanie,echo = F,fig.align='center', out.width='80%'}
 # wygładzanie - metoda średniej ruchomej 
 ts_filter = stats::filter(time_series, rep(1/2,2))
 
@@ -109,7 +115,7 @@ legend("topleft", legend = c('średnia ruchoma', 'regresja nielokalna'), col = c
 ## Trend
 Przeanalizujemy teraz trend przy pomocy kilku różnych metod.
 
-```{r trend}
+```{r trend,echo = F,fig.align='center', out.width='80%'}
 # trend - decompose
 ts_decompose_trend = dec$trend
 
@@ -148,7 +154,7 @@ kable(trends, caption = 'Statystyki dla różnych metod estymacji trendu')
 Na powyższym wykresie widzimy trzy różne metody estymacji trendu metodę trendu wielomianowego z 2 i 4 stopniami, liniowego oraz wcześniej wspomnianą funkcję decompose. Estymację trendu ostatnią metodą bierzemy dla porównania, nie bierzemy jej pod uwagę przy wyborze metody, ponieważ po usunięciu trendu przy pomocy tej metody, nie ma łatwej i oczywistej metody, aby dodać go z powrotem do naszej prognozy. Pozostałe metody porównujemy, analizując ich zachowanie na wykresie oraz wartości RSE i R kwadrat. Metoda trendu liniowego wydaję się być najgorsza w tym przypadku, ma ona największy błąd (RSE) oraz najmniejszą wartość dla współczynnika determinacji (R kwadrat). Metoda trendu wielomianowego w obu przypadkach ma lepsze wartości niż metoda trendu liniowego, na wykresie też wydaję się lepiej dopasowywać do naszych danych. Porównując tę metodę dla różnej ilości stopni widać wyraźnie, że lepsze wartości dostajemy przy 4 stopniach swobody.
 
 ## Sezonowość
-```{r sezonowosc}
+```{r sezonowosc, echo = F,fig.align='center', out.width='80%'}
 # sezonowość linowo 
 ts_linear_season = tslm(time_series ~ season)
 ts_linear_season_vals = fitted.values(ts_linear_season)
@@ -163,7 +169,7 @@ Sezonowość dla naszego szeregu znajdujemy przy pomocy funkcji tslm, ma ona wyr
 
 Będziemy teraz usuwać trend i sezonowość, przy pomocy odpowiednio metody wielomianowej i funkcji tslm. Sprawdzimy, czy ma znaczenie, co usuniemy pierwsze.
 
-```{r dec23}
+```{r dec23,echo = F,fig.align='center', out.width='80%'}
 #usuwamy trend i sezonowosc
 ts = time_series - poly4_vals
 sez = fitted.values(tslm(ts ~ season))
@@ -181,7 +187,7 @@ Wykres wskazuję na to, że nie ma żadnego znaczenia, co usuwamy pierwsze, poni
 
 ## Dekompozycja
 
-```{r dec2}
+```{r dec2,echo = F,fig.align='center', out.width='80%'}
 # motody usuwania trendu:
 trend_poly = tslm(time_series ~ trend + poly(trend,4))
 trend_poly_vals = fitted.values(poly4)
@@ -240,7 +246,7 @@ legend("topleft",
 
 ## Wskaźniki AIC, BIC, AICC
 
-```{r modele_wsk}
+```{r modele_wsk,echo = F,fig.align='center', out.width='80%'}
 # statystyki aic, bic, aicc
 stats = function(ts){
   model = auto.arima(ts)
@@ -256,8 +262,8 @@ kable(df, caption= 'Wskaźniki dla różnych modeli')
 ## ARIMA
 
 ### Dobór modelu dla trendu wielomianowego
-```{r modele1}
-auto.arima(ts1) #napisac w komentarzu ze auto.arima to 1 0 0
+```{r modele1,echo = F,fig.align='center', out.width='80%'}
+#auto.arima(ts1) #napisac w komentarzu ze auto.arima to 1 0 0
 
 matrix_ts1 = matrix(0,5,5)
 for (i in 1:5){
@@ -276,25 +282,29 @@ model1 = arima(ts1, c(3,0,4)) #wybieramy Arima 3 0 4
 sarima(ts1, 3,0,4) #opisac residua - wnioski z qq plot i testu ljunga-boxa
 ```
 
+```{r rarimawykres, echo = F, fig.align='center', out.width='80%'}
+#knitr::include_graphics('teo_12.png')
+```
+
 ### Dobór modelu dla szeregu wygładzonego metodą średniej ruchomej
 
-```{r modele}
-auto.arima(ts4) #napisac w komentarzu ze auto.arima to 1 0 0
+```{r modele,echo = F, fig.align='center', out.width='80%'}
+#auto.arima(ts5) #napisac w komentarzu ze auto.arima to 1 0 0
 
-matrix_ts4 = matrix(0,5,5)
+matrix_ts5 = matrix(0,5,5)
 for (i in 1:5){
   for (j in 1:5){
-    matrix_ts4[i,j]= AIC(arima(ts1, c(i,0,j)))}}
+    matrix_ts5[i,j]= AIC(arima(ts5, c(i,0,j)))}}
 
 cnames = c(' ', 'MA = 1', 'MA = 2','MA = 3','MA = 4','MA = 5')
 rnames = c('AR = 1', 'AR = 2','AR = 3','AR = 4','AR = 5')
-df = data.frame(rnames, matrix_ts4)
+df = data.frame(rnames, matrix_ts5)
 colnames(df) = cnames
 
 kable(df, caption = 'Wartości statystyki AIC dla różnych modeli ARMA')
 
-model4 = arima(ts4, c(3,0,4))
-sarima(ts4, 3,0,4)
+model5 = arima(ts5, c(3,0,4))
+sarima(ts5, 3,0,4)
 ```
 
 # Prognozowanie
@@ -321,7 +331,7 @@ Intuicyjnie spodziewamy się, że dla kilku pierwszych prognoz otrzymamy najmnie
 W tabeli widzimy sumę MSE dla każdej z metod. Najmniejszy błąd otrzymaliśmy dla funkcji *sarima.for*. Na tej podstawie uznajemy ją za najbardziej optymalną i używamy do wyznaczenia kolejnych prognoz. 
 
 
-```{r forecasts}
+```{r forecasts,echo = F,fig.align='center', out.width='80%'}
 #model1 3 0 4
 # ts - dane od 2004 - 2023
 learning_set = window(ts1, start = c(2004,1), end=c(2021, 12))
@@ -335,13 +345,14 @@ hw_pred = forecast(hw(learning_set, 24, level = 95))
 holt_pred = forecast(holt(learning_set, 24, level = 95))
 
 #wartosci
-pred_vals = preds$pred
+pred_vals = pred$pred
 forecast_vals = (forecast_pred$upper+forecast_pred$lower)/2
 ses_vals = (ses_pred$upper+ses_pred$lower)/2
 hw_vals = (hw_pred$upper+hw_pred$lower)/2
 holt_vals = (holt_pred$upper+holt_pred$lower)/2
 
-indexes = 1:length(preds$dates)
+indexes = 1:length(pred$pred)
+dates = pred$dates
 
 #wykresy
 par(mfrow=c(2,2))
@@ -367,8 +378,8 @@ ses_mse = (ses_vals - test_set)**2
 hw_mse = (hw_vals - test_set)**2
 holt_mse = (holt_vals - test_set)**2
 
-mse = data.frame(dates,pred_mse, forecast_mse, ses_mse, hw_mse, holt_mse)
-colnames(mse) = c('Date', 'sarima', 'forecast', 'ses', 'hw', 'holt')
+mse = data.frame(pred_mse, forecast_mse, ses_mse, hw_mse, holt_mse)
+colnames(mse) = c('sarima', 'forecast', 'ses', 'hw', 'holt')
 
 plot(indexes, mse$sarima, ylim = c(0,1000), type = 'l', col = 'red', main ='MSE predykcji dla stosowanych metod', xlim = c(-5, 24), ylab = 'Wartość MSE', xlab = 'Czas')
 lines(indexes, mse$forecast, col='blue')
@@ -392,9 +403,9 @@ kable(sum_df, caption="Łączne MSE dla każdej z metod predykcji" )
 
 ### Predykcja
 
-Poniższy wykres przedstawia prognozy dla danych do $2032$ roku z uwzględnieniem trendu i sezonowości. 
+Poniższy wykres przedstawia prognozy dla danych do $2025$ roku z uwzględnieniem trendu i sezonowości. 
 
-```{r forecasts1}
+```{r forecasts1,echo = F,fig.align='center', out.width='80%'}
 df = as.data.frame(data) 
 t1 = ts(df$Number[1:240], frequency=12, start = c(2004,1))
 dataset1 = ts1 # 304
@@ -403,41 +414,40 @@ pred1 = sarima.for(ts1,24, 3, 0,4, plot = FALSE)$pred
 dataset2 = ts(c(dataset1,pred1), start=c(2004,1), frequency=12)
 pred2 = sarima.for(dataset2,24, 3, 0,4, plot = FALSE)$pred
 
-dataset3 = ts(c(dataset2,pred2), start=c(2004,1), frequency=12)
-pred3 = sarima.for(dataset3,24, 3, 0,4, plot = FALSE)$pred
+#dataset3 = ts(c(dataset2,pred2), start=c(2004,1), frequency=12)
+#pred3 = sarima.for(dataset3,24, 3, 0,4, plot = FALSE)$pred
 
-dataset4 = ts(c(dataset3,pred3), start=c(2004,1), frequency=12)
-pred4 = sarima.for(dataset4,24, 3, 0,4, plot = FALSE)$pred
+#dataset4 = ts(c(dataset3,pred3), start=c(2004,1), frequency=12)
+#pred4 = sarima.for(dataset4,24, 3, 0,4, plot = FALSE)$pred
 
-dataset5 = ts(c(dataset4,pred4), start=c(2004,1), frequency=12)
-pred5 = sarima.for(dataset5,24, 3, 0,4, plot = FALSE)$pred
+#dataset5 = ts(c(dataset4,pred4), start=c(2004,1), frequency=12)
+#pred5 = sarima.for(dataset5,24, 3, 0,4, plot = FALSE)$pred
 
-pred_altern = sarima.for(ts1,24*5, 3, 0,4, plot=FALSE)$pred
-dataset_altern = ts(c(ts1,pred_altern), start=c(2004,1), frequency=12)
-
+#pred_altern = sarima.for(ts1,24*5, 3, 0,4, plot=FALSE)$pred
+#dataset_altern = ts(c(ts1,pred_altern), start=c(2004,1), frequency=12)
 
 #dodanie trendu i sezonowosci do predykcji
-predict_trend = predict(trend_poly_vals, 24*5, level=0.95)
+predict_trend = predict(trend_poly_vals, 24, level=0.95)
 predict_trend_vals = (predict_trend$upper+predict_trend$lower)/2
-predict_season = predict(fitted.values(tslm(dane1 ~ season)), 24*5, level=0.95)
+predict_season = predict(fitted.values(tslm(dane1 ~ season)), 24, level=0.95)
 season = fitted.values(tslm(dane1 ~ season))
 
 new_trend = ts(c(trend_poly_vals,predict_trend_vals), start=c(2004,1), frequency=12) 
 new_season = ts(c(predict_season$upper,season), start=c(2004,1), frequency=12) 
 
-new_data = new_trend+dataset5 + new_season
-plot(new_data, main = "Predykcja wartości szeregu na 10 kolejnych lat", xlab = "Czas", ylab = "Wartość")
+new_data = new_trend+dataset2 + new_season
+plot(new_data, main = "Predykcja wartości szeregu na kolejne 2 lata", xlab = "Czas", ylab = "Wartość", type='l')
 ```
 
-## Model dla szeregu wygładzonego metodą średniej ruchomej
+## Model dla szeregu wygładzonego metodą regresji nielokalnej
 
 ### Porównanie metod predykcji 
 
-```{r forecasts}
+```{r forecasts3,echo = F, fig.align='center', out.width='80%'}
 #model4 3 0 4
 # ts - dane od 2004 - 2023
-learning_set = window(ts4, start = c(2004,1), end=c(2021, 12))
-test_set = window(ts4, start = c(2022,1), end = c(2023, 12))
+learning_set = window(ts5, start = c(2004,1), end=c(2021, 12))
+test_set = window(ts5, start = c(2022,1), end = c(2023, 12))
 
 #modele
 pred = sarima.for(learning_set,24,3,0,4, plot = FALSE)
@@ -447,14 +457,14 @@ hw_pred = forecast(hw(learning_set, 24, level = 95))
 holt_pred = forecast(holt(learning_set, 24, level = 95))
 
 #wartosci
-pred_vals = preds$pred
+pred_vals = pred$pred
 forecast_vals = (forecast_pred$upper+forecast_pred$lower)/2
 ses_vals = (ses_pred$upper+ses_pred$lower)/2
 hw_vals = (hw_pred$upper+hw_pred$lower)/2
 holt_vals = (holt_pred$upper+holt_pred$lower)/2
 
 dates = data$Date[217:240]
-indexes = 1:length(preds$dates)
+indexes = 1:length(pred$pred)
 
 
 #wykresy
@@ -504,42 +514,42 @@ kable(sum_df1, caption="Łączne MSE dla każdej z metod predykcji" )
 
 ### Predykcja
 
-```{r forecasts1}
-dataset1 = ts4 # 304
-pred1 = sarima.for(ts4,24, 3, 0,4, plot = FALSE)$pred
+```{r forecasts13,echo = F,fig.align='center', out.width='80%'}
+dataset1 = ts5 # 304
+pred1 = sarima.for(ts5,24, 3, 0,4, plot = FALSE)$pred
 
 dataset2 = ts(c(dataset1,pred1), start=c(2004,1), frequency=12)
 pred2 = sarima.for(dataset2,24, 3, 0,4, plot = FALSE)$pred
 
-dataset3 = ts(c(dataset2,pred2), start=c(2004,1), frequency=12)
-pred3 = sarima.for(dataset3,24, 3, 0,4, plot = FALSE)$pred
+#dataset3 = ts(c(dataset2,pred2), start=c(2004,1), frequency=12)
+#pred3 = sarima.for(dataset3,24, 3, 0,4, plot = FALSE)$pred
 
-dataset4 = ts(c(dataset3,pred3), start=c(2004,1), frequency=12)
-pred4 = sarima.for(dataset4,24, 3, 0,4, plot = FALSE)$pred
+#dataset4 = ts(c(dataset3,pred3), start=c(2004,1), frequency=12)
+#pred4 = sarima.for(dataset4,24, 3, 0,4, plot = FALSE)$pred
 
-dataset5 = ts(c(dataset4,pred4), start=c(2004,1), frequency=12)
-pred5 = sarima.for(dataset5,24, 3, 0,4, plot = FALSE)$pred
+#dataset5 = ts(c(dataset4,pred4), start=c(2004,1), frequency=12)
+#pred5 = sarima.for(dataset5,24, 3, 0,4, plot = FALSE)$pred
 
-pred_altern = sarima.for(ts1,24*5, 3, 0,4, plot=FALSE)$pred
-dataset_altern = ts(c(ts1,pred_altern), start=c(2004,1), frequency=12)
+pred_altern = sarima.for(ts5,24, 3, 0,4, plot=FALSE)$pred
+dataset_altern = ts(c(ts5,pred_altern), start=c(2004,1), frequency=12)
 
 #dodanie trendu i sezonowosci do predykcji
-predict_trend = predict(trend_filter, 24*5, level=0.95)
+predict_trend = predict(trend_lowess, 24, level=0.95)
 predict_trend_vals = (predict_trend$upper+predict_trend$lower)/2
-predict_season = predict(fitted.values(tslm(dane4 ~ season)), 24*5, level=0.95)
-season = fitted.values(tslm(dane4 ~ season))
+predict_season = predict(fitted.values(tslm(dane5 ~ season)), 24, level=0.95)
+season = fitted.values(tslm(dane5 ~ season))
 
-new_trend = ts(c(trend_filter,predict_trend_vals), start=c(2004,1), frequency=12) 
+new_trend = ts(c(trend_lowess,predict_trend_vals), start=c(2004,1), frequency=12) 
 new_season = ts(c(predict_season$upper,season), start=c(2004,1), frequency=12) 
 
-new_data1 = new_trend+dataset5 + new_season
-plot(new_data1, main = "Predykcja wartości szeregu na 10 kolejnych lat", xlab = "Czas", ylab = "Wartość")
+new_data1 = new_trend+dataset2 + new_season
+plot(new_data1, main = "Predykcja wartości szeregu na kolejne 2 lata", xlab = "Czas", ylab = "Wartość")
 ```
 
 ## Porównanie szeregów
 
-```{r porownanie}
-plot(time_series, main = 'Wygładzanie szeregu metodą średniej ruchomej', xlab = 'Czas', ylab = 'Wartość')
+```{r porownanie,echo = F, fig.align='center', out.width='80%'}
+plot(time_series, main = 'Wygładzanie szeregu metodą regresji nielokalnej', xlab = 'Czas', ylab = 'Wartość')
 lines(ts_filter, col = 'red')
 legend("topleft", legend=c("Szereg czasowy", "Wygładzony szereg czasowy"),  
        fill = c("black","red"), bty="n")
@@ -554,7 +564,7 @@ legend("topleft", legend=c("Sezonowość", "Trend"),
 
 plot(ts_filter, ylim = c(0,100),main = "Wygładzony szereg czasowy", xlab = 'Czas', ylab = 'Wartość')
 lines(trend_filter,col ='darkred', lwd = 2)
-lines(fitted.values(tslm(dane4 ~ season))+30, col ='red', lwd = 1)
+lines(fitted.values(tslm(dane5 ~ season))+30, col ='red', lwd = 1)
 legend("topleft", legend=c("Sezonowość", "Trend"),  
        fill = c("red", "darkred"), bty="n")
 
