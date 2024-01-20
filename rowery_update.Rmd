@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Cel biznesowy
 
-Właściciel sklepu z rowerami i częściami rowerowymi mający siedziby w różnych miastach na Dolnym Śląsku zastanawia się , ile towaru ma zamówić przed rozpoczęciem sezonu. W tym celu chce wiedzieć, jakie będzie przyszłe zainteresowanie Dolnoślązaków rowerami. Naszym zadaniem, jako osób zatrudnionych przez właściciela sklepu rowerowego jest prognoza zainteresowania hasłem "rowery" w województwie dolnośląski w okresie najbliższych dwóch lat, co przedstawimy w następującym projekcie.
+Właściciel sklepu z rowerami i częściami rowerowymi, mający siedziby w różnych miastach na Dolnym Śląsku, zastanawia się  ile towaru ma zamówić przed rozpoczęciem sezonu. W tym celu chce wiedzieć jakie będzie przyszłe zainteresowanie Dolnoślązaków rowerami. Naszym zadaniem, jako osób zatrudnionych przez właściciela sklepu rowerowego, jest prognoza zainteresowania hasłem "rowery" w województwie dolnośląskim w okresie najbliższych dwóch lat, co przedstawimy w następującym projekcie.
 
 ```{r biblioteki, echo = F, warnings=FALSE, message=FALSE, include=FALSE}
 library(TSstudio)
@@ -30,7 +30,7 @@ library(knitr)
 
 # Wczytywanie danych do szeregu
 
-Danę, na temat zainteresowania rowerami pozyskujemy ze strony Google Trends. Zawierają one liczbę wyszukiwań hasła "rowery" na Dolnym Śląsku przez przeglądarkę Google każdego miesiąca od stycznia 2004 roku. 
+Dane na temat zainteresowania rowerami pozyskujemy ze strony Google Trends. Zawierają one liczbę wyszukiwań hasła "rowery" na Dolnym Śląsku przez przeglądarkę Google każdego miesiąca od stycznia 2004 roku. 
 
 ```{r dane,echo = F}
 data = read.csv('/Users/magda/Desktop/szeregi_czasowev2/rowery.csv', sep = ';')
@@ -41,7 +41,7 @@ time_series = ts(df$Number, frequency=12, start = c(2004,1))
 
 # Intuicja o danych
 
-Dokonamy, teraz ogólnego przeglądu danych, w celu wyrobienia początkowej intuicji na temat ich zachowania. 
+Dokonamy teraz ogólnego przeglądu danych, w celu wyrobienia początkowej intuicji na temat ich zachowania. 
 
 ```{r info,echo = F,fig.align='center', out.width='80%'}
 # Szereg czasowy
@@ -63,7 +63,7 @@ plot(year_sum$Year, year_sum$Suma, main = 'Łączna liczba wyszukań dla poszcze
      xlab = 'Rok', ylab='Liczba wyszukań')
 ```
 
-Na powyższym wykresie przedstawiamy surowe dane. Widać na nim wyraźnie, że zainteresowanie hasłem "rowery" przedstawia się w postaci pików, czyli przez na krótkim odcinku czasu wartości gwałtownie rosły, aby potem gwałtownie zmaleć. Potwierdza to również drugi wykres, na którym przedstawiamy, jak zmieniają się wartości w zależności na miesiąc. Widzimy, że największe wartości dostajemy w maju, natomiast najniższe w styczniu i grudniu, w okresie wiosenno-letnim popularność rowerów jest znacząco większa, niż w okresie jesienno-zimowym. Oba wykresy wskazują więc na możliwą sezonowość występującą w naszych danych. 
+Na powyższym wykresie przedstawiamy surowe dane. Widać na nim wyraźnie, że zainteresowanie hasłem "rowery" przedstawia się w postaci pików, czyli na krótkim odcinku czasu wartości gwałtownie rosły, aby potem gwałtownie zmaleć. Potwierdza to również drugi wykres, na którym przedstawiamy jak zmieniają się wartości w zależności na miesiąc. Widzimy, że największe wartości dostajemy w maju, natomiast najniższe w styczniu i grudniu, w okresie wiosenno-letnim popularność rowerów jest znacząco większa, niż w okresie jesienno-zimowym. Oba wykresy wskazują więc na możliwą sezonowość występującą w naszych danych. 
 
 Warte zwrócenia uwagi na pierwszym wykresie jest również to, że w początkowych okresach, które badamy, maksymalna liczba wyszukiwań nie przekraczała 40, natomiast w późniejszych okresach osiąga wartości maksymalne powyżej 60. Bardzo dobrze widać to na trzecim wykresie, gdzie bierzemy sumę liczby wyszukań w roku. Oba wykresy wskazują więc na możliwy trend występujący w naszych danych. 
 
@@ -80,7 +80,7 @@ Powyższy wykres składa się z czterech komponentów: surowych danych, trendu, 
 
 ## Wygładzanie szeregu
 
-Pierwszą czynnością, którą musimy wykonać, przy dekompozycji szeregu czasowego jest wygładzanie, czyli odkrywanie głównej tendencji rozwojowej. Będziemy korzystać z dwóch metod wygładzania szeregu, metody średniej ruchomej oraz regresji nielokalnej.
+Pierwszą czynnością, którą musimy wykonać przy dekompozycji szeregu czasowego jest wygładzanie, czyli odkrywanie głównej tendencji rozwojowej. Będziemy korzystać z dwóch metod wygładzania szeregu: metody średniej ruchomej oraz regresji nielokalnej.
 
 ```{r wygladzanie,echo = F,fig.align='center', out.width='80%'}
 # wygładzanie - metoda średniej ruchomej 
@@ -183,7 +183,7 @@ lines(ts2-trend2, col='green')
 #wniosek: nie ma znaczenia co usuwamy pierwsze
 ```
 
-Wykres wskazuję na to, że nie ma żadnego znaczenia, co usuwamy pierwsze, ponieważ linie dla obu metod pokrywają się na wykresie. 
+Wykres wskazuje na to, że nie ma żadnego znaczenia, co usuwamy pierwsze, ponieważ linie dla obu metod pokrywają się na wykresie. 
 
 ## Dekompozycja
 
@@ -246,6 +246,8 @@ legend("topleft",
 
 ## Wskaźniki AIC, BIC, AICC
 
+Przy doborze modelu chcemy minimalizować te współczynniki.
+
 ```{r modele_wsk,echo = F,fig.align='center', out.width='80%'}
 # statystyki aic, bic, aicc
 stats = function(ts){
@@ -281,6 +283,8 @@ kable(df, caption = 'Wartości statystyki AIC dla różnych modeli ARMA')
 model1 = arima(ts1, c(3,0,4)) #wybieramy Arima 3 0 4
 sarima(ts1, 3,0,4) #opisac residua - wnioski z qq plot i testu ljunga-boxa
 ```
+Wybrałyśmy model arima(3,0,4), który dostatecznie minimalizował AIC. Analizując p-wartości dla testu Ljung-Boxa nie mamy podstaw, aby odrzucić hipotezę o niezależności danych. Patrząc na wykres qqplot możemy założyć, że dane są z rozkładu normalnego.
+
 
 ```{r rarimawykres, echo = F, fig.align='center', out.width='80%'}
 #knitr::include_graphics('teo_12.png')
@@ -306,10 +310,10 @@ kable(df, caption = 'Wartości statystyki AIC dla różnych modeli ARMA')
 model5 = arima(ts5, c(3,0,4))
 sarima(ts5, 3,0,4)
 ```
-
+Tutaj również wybrałyśmy model arima(3,0,4). Patrząc na wykres qqplot możemy założyć, że dane są z rozkładu normalnego.  Analizując p-wartości dla testu Ljung-Boxa możemy mieć problem z niezależnością danych.
 # Prognozowanie
 
-W końcowej części raportu zajmiemy się predkcją kolejnych wartości analizowanego szeregu czasowego. Naszym celem będzie wyznaczenie prognoz dla zainteresowania rowerami na kolejne 10 lat. W tym celu omówimy wybrane metody predykcji i wybierzemy najbardziej optymalną z nich. Prognozy wykonamy dla oryginalnego szeregu czasowego oraz dla szeregu wygładzonego metodą średniej ruchomej. W ostatnim kroku porównamy wyniki dla obu podejść oraz przedstawimy ich wady i zalety. 
+W końcowej części raportu zajmiemy się predykcją kolejnych wartości analizowanego szeregu czasowego. Naszym celem będzie wyznaczenie prognoz dla zainteresowania rowerami na kolejne 10 lat. W tym celu omówimy wybrane metody predykcji i wybierzemy najbardziej optymalną z nich. Prognozy wykonamy dla oryginalnego szeregu czasowego oraz dla szeregu wygładzonego metodą średniej ruchomej. W ostatnim kroku porównamy wyniki dla obu podejść oraz przedstawimy ich wady i zalety. 
 
 ## Model dla oryginalnego szeregu 
 
