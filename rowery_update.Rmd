@@ -23,6 +23,9 @@ library(knitr)
 ```
 
 # Wczytywanie danych do szeregu
+
+Danę, na temat zainteresowania rowerami pozyskujemy ze strony Google Trends. Zawierają one liczbę wyszukiwań hasła "rowery" na Dolnym Śląsku przez przeglądarkę Google każdego miesiąca od stycznia 2004 roku. 
+
 ```{r dane}
 data = read.csv('/Users/magda/Desktop/szeregi_czasowev2/rowery.csv', sep = ';')
 
@@ -31,6 +34,9 @@ time_series = ts(df$Number, frequency=12, start = c(2004,1))
 ```
 
 # Intuicja o danych
+
+Dokonamy, teraz ogólnego przeglądu danych, w celu wyrobienia początkowej intuicji na temat ich zachowania. 
+
 ```{r info}
 # Szereg czasowy
 plot(time_series, main = 'Zainteresowanie rowerami w województwie dolnośląskim', xlab ='Czas', ylab= 'Ilość wyszukań')
