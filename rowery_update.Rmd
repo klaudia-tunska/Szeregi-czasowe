@@ -311,6 +311,7 @@ model5 = arima(ts5, c(3,0,4))
 sarima(ts5, 3,0,4)
 ```
 Tutaj również wybrałyśmy model arima(3,0,4). Patrząc na wykres qqplot możemy założyć, że dane są z rozkładu normalnego.  Analizując p-wartości dla testu Ljung-Boxa możemy mieć problem z niezależnością danych.
+
 # Prognozowanie
 
 W końcowej części raportu zajmiemy się predykcją kolejnych wartości analizowanego szeregu czasowego. Naszym celem będzie wyznaczenie prognoz dla zainteresowania rowerami na kolejne 10 lat. W tym celu omówimy wybrane metody predykcji i wybierzemy najbardziej optymalną z nich. Prognozy wykonamy dla oryginalnego szeregu czasowego oraz dla szeregu wygładzonego metodą średniej ruchomej. W ostatnim kroku porównamy wyniki dla obu podejść oraz przedstawimy ich wady i zalety. 
