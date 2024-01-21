@@ -33,7 +33,7 @@ library(knitr)
 Dane na temat zainteresowania rowerami pozyskujemy ze strony Google Trends. Zawierają one liczbę wyszukiwań hasła "rowery" na Dolnym Śląsku przez przeglądarkę Google każdego miesiąca od stycznia 2004 roku. 
 
 ```{r dane,echo = F}
-data = read.csv('C:/Users/klaud/Documents/Szeregi czasowe/rowery.csv', sep = ';')
+data = read.csv('rowery.csv', sep = ';')
 
 df = as.data.frame(data) 
 time_series = ts(df$Number, frequency=12, start = c(2004,1))
@@ -92,7 +92,7 @@ lines(stats::filter(time_series, rep(1/2,2)), type='l', col = 'red')
 lines(stats::filter(time_series, rep(1/4,4)), type='l', col = 'blue')
 lines(stats::filter(time_series, rep(1/6,6)), type='l', col = 'green')
 legend("topleft", legend = c(2, 4, 6), col = c('red', 'blue', 'green'),pch=20, 
-       title = 'Parametry średniej')
+       title = 'Parametry średniej', bty="n")
 
 # wygladzanie - regresja nielokalna
 ts_lowess = lowess(time_series, f=0.01)
@@ -102,13 +102,13 @@ lines(lowess(time_series, f=0.01), type='l', col = 'red')
 lines(lowess(time_series, f=0.03), type='l', col = 'blue')
 lines(lowess(time_series, f=0.05), type='l', col = 'green')
 legend("topleft", legend = c(0.01, 0.03, 0.05), col = c('red', 'blue', 'green'),pch=20, 
-       title = 'Parametry regresji')
+       title = 'Parametry regresji', bty="n")
 
 # porownanie obu metod
 plot(time_series, main = 'Wygładzanie szeregu', ylab = 'Ilość wyszukań', xlab = 'Czas')
 lines(ts_filter, col = 'red')
 lines(ts_lowess, col = 'blue')
-legend("topleft", legend = c('średnia ruchoma', 'regresja nielokalna'), col = c('red', 'blue'),pch=20, title = 'Metoda wygładzania')
+legend("topleft", legend = c('średnia ruchoma', 'regresja nielokalna'), col = c('red', 'blue'),pch=20, title = 'Metoda wygładzania', bty="n")
 
 ```
 
@@ -141,7 +141,7 @@ lines(ts_linear_trend_vals, col = 'green')
 lines(ts_decompose_trend, col = 'magenta')
 legend("topleft", 
        legend = c('wielomian st. 2', 'wielomian st. 4', 'trend liniowy', 'decompose'), 
-       col = c('blue', 'red', 'green', 'magenta'),pch=20, title = 'Metoda estymacji trendu')
+       col = c('blue', 'red', 'green', 'magenta'),pch=20, title = 'Metoda estymacji trendu', bty="n")
 
 # porownanie trendow 
 slinear = summary(ts_linear_trend)
@@ -182,11 +182,11 @@ sez = fitted.values(tslm(ts ~ season))
 ts2 = time_series - fitted.values(tslm(time_series ~ season))
 trend2 = fitted.values(tslm(ts2 ~ trend + poly(trend,4)))
 
-plot(ts-sez, xlab="Rok", ylab="Wartosc")
+plot(ts-sez, xlab="Rok", ylab="Wartosc", main = "Szereg czasowy bez trendu i sezonowości")
 lines(ts2-trend2, col='green')
 legend("topleft", 
        legend = c('1. Trend, 2. Sezonowość', '1. Sezonowość, 2. Trend'), 
-       col = c('black', 'green'),pch=20, title = 'Kolejność usuwania')
+       col = c('black', 'green'),pch=20, title = 'Kolejność usuwania', bty="n")
 
 #wniosek: nie ma znaczenia co usuwamy pierwsze
 ```
@@ -237,24 +237,26 @@ dane5 = pom5 - trend_lowess
 ts5 = dane5 - fitted.values(tslm(dane5 ~ season))
 
 # wykresy dla 5 modeli:
-plot(ts1, main = 'Szereg czasowy po usunięciu trendu i sezonowości', ylab = 'Ilość wyszukań', xlab = 'Czas')
+plot(ts1, main = 'Szereg czasowy po usunięciu trendu i sezonowości', ylab = 'Ilość wyszukań', xlab = 'Czas', ylim = c(-30,50))
 lines(ts2, col = 'red')
 lines(ts3, col='blue')
 legend("topleft", 
        legend = c('poly,tslm', 'diff', 'decompose'), 
-       col = c('black', 'red','blue'),pch=20, title = 'Metoda estymacji')
+       col = c('black', 'red','blue'),pch=20, title = 'Metoda estymacji', bty="n")
 
-plot(ts1, main = 'Szereg czasowy po usunięciu trendu i sezonowości', ylab = 'Ilość wyszukań', xlab = 'Czas')
+plot(ts1, main = 'Szereg czasowy po usunięciu trendu i sezonowości', ylab = 'Ilość wyszukań', xlab = 'Czas',  ylim = c(-30,50))
 lines(ts4, col = 'red')
 lines(ts5, col='blue')
 legend("topleft", 
-       legend = c('oryginalne dane', 'średnia ruchoma', 'regresja wieloraka'), 
-       col = c('black', 'red','blue'),pch=20, title = 'Metoda wygładzania')
+       legend = c('oryginalne dane', 'średnia ruchoma', 'regresja nielokalna'), 
+       col = c('black', 'red','blue'),pch=20, title = 'Metoda wygładzania', bty="n")
 ```
 
 Na pierwszym z powyższych wykresów widzimy na czarno szereg, z którego usunęliśmy trend metodą wielomianową i szereg za pomocą funkcji tslm, na czerwono korzystaliśmy  z funkcji diff do usunięcia trendu i sezonowości, a na niebiesko korzystaliśmy z funkcji decompose. Wyniki dla diff znacznie odbiegają od wyników dla pozostałych metod, mają one duże piki. Wyniki dla pierwszej i trzeciej metody miejscami różnią się, ale ciężko powiedzieć, która jest lepsza, tylko na podstawie wykresu. Czynnikiem decydujący przy wyborze metody jest to, czy istnieje oczywisty sposób na przywrócenie trendu i sezonowości po ich odjęciu. W przypadku diff i decompose nie ma takiego sposobu, dlatego wybieramy pierwszą metodę.
 
 Na drugim  wykresie widzimy wygładzenie naszego modelu dwoma metodami. Tak, jak wcześniej na razie ciężko stwierdzić, która metoda jest lepsza, dlatego rozważamy je obie w dalszej części raportu.
+
+\newpage
 
 
 # Dobór modelu
@@ -280,8 +282,12 @@ kable(df, caption= 'Wskaźniki dla różnych modeli')
 
 ### Dobór modelu dla trendu wielomianowego
 
-```{r modele1,echo = F,fig.align='center', out.width='80%'}
+```{r modele1,echo = F,fig.align='center', out.width='80%', warning=FALSE}
 #auto.arima(ts1) #napisac w komentarzu ze auto.arima to 1 0 0
+
+par(mfrow=c(1,2))
+pacf(ts1, main = "PACF")
+acf(ts1, main = "ACF")
 
 matrix_ts1 = matrix(0,5,5)
 for (i in 1:5){
@@ -297,19 +303,26 @@ kable(df, caption = 'Wartości statystyki AIC dla różnych modeli ARMA')
 # aic maja podobne wartosci
 
 model1 = arima(ts1, c(3,0,4)) #wybieramy Arima 3 0 4
-sarima(ts1, 3,0,4) #opisac residua - wnioski z qq plot i testu ljunga-boxa
+
 ```
+
+```{r rarimawykres, echo = F, fig.align='center', out.width='80%'}
+knitr::include_graphics('sarima1.png')
+```
+
 Wybrałyśmy model arima(3,0,4), który dostatecznie minimalizował AIC. Analizując p-wartości dla testu Ljung-Boxa nie mamy podstaw, aby odrzucić hipotezę o niezależności danych. Patrząc na wykres qqplot możemy założyć, że dane są z rozkładu normalnego.
 
 
-```{r rarimawykres, echo = F, fig.align='center', out.width='80%'}
-#knitr::include_graphics('teo_12.png')
-```
 
-### Dobór modelu dla szeregu wygładzonego metodą średniej ruchomej
 
-```{r modele,echo = F, fig.align='center', out.width='80%'}
+### Dobór modelu dla szeregu wygładzonego metodą regresji nielokalnej
+
+```{r modele,echo = F, fig.align='center', out.width='80%', warning=FALSE}
 #auto.arima(ts5) #napisac w komentarzu ze auto.arima to 1 0 0
+
+par(mfrow=c(1,2))
+pacf(ts5, main = "PACF")
+acf(ts5, main = "ACF")
 
 matrix_ts5 = matrix(0,5,5)
 for (i in 1:5){
@@ -324,14 +337,19 @@ colnames(df) = cnames
 kable(df, caption = 'Wartości statystyki AIC dla różnych modeli ARMA')
 
 model5 = arima(ts5, c(3,0,4))
-sarima(ts5, 3,0,4)
 ```
+```{r rarimawykres2, echo = F, fig.align='center', out.width='80%'}
+knitr::include_graphics('sarima2.png')
+```
+
+
 Tutaj również wybrałyśmy model arima(3,0,4). Patrząc na wykres qqplot możemy założyć, że dane są z rozkładu normalnego.  Analizując p-wartości dla testu Ljung-Boxa możemy mieć problem z niezależnością danych.
 
+\newpage
 
 # Prognozowanie
 
-W końcowej części raportu zajmiemy się predykcją kolejnych wartości analizowanego szeregu czasowego. Naszym celem będzie wyznaczenie prognoz dla zainteresowania rowerami na kolejne 10 lat. W tym celu omówimy wybrane metody predykcji i wybierzemy najbardziej optymalną z nich. Prognozy wykonamy dla oryginalnego szeregu czasowego oraz dla szeregu wygładzonego metodą średniej ruchomej. W ostatnim kroku porównamy wyniki dla obu podejść oraz przedstawimy ich wady i zalety. 
+W końcowej części raportu zajmiemy się predykcją kolejnych wartości analizowanego szeregu czasowego. Naszym celem będzie wyznaczenie prognoz dla zainteresowania rowerami na kolejne 2 lata. W tym celu omówimy wybrane metody predykcji i wybierzemy najbardziej optymalną z nich. Prognozy wykonamy dla oryginalnego szeregu czasowego oraz dla szeregu wygładzonego metodą regresji nielokalnej. W ostatnim kroku porównamy wyniki dla obu podejść oraz przedstawimy ich wady i zalety. 
 
 ## Model dla oryginalnego szeregu 
 
@@ -343,17 +361,8 @@ Do predykcji użyjemy następujących metod:
  2. *forecast()*  
  3. metody wygładzania wykładniczego: *ses()*, *hw()*, *holt()*
  
-Na poniższym wykresie przedstawione jest porównanie predykcji dla wszystkich metod z wartościami zbioru testowego. Widzimy, że kształty funkcji *sarima.for()*, *forecast()* i *hw()* przypominają zachowanie szeregu czasowego. 
 
-Aby wybrać najdokładniejszą z metod porównamy błędy MSE dla wartości użytej funkcji oraz wartości zbioru testowego. Wyniki przedstawione są na wykresach:  
-
-MSE dla metod *holt()* i *ses()* przyjmuje bardzo duże wartości. Błędy dla pozostałych modeli są sobie znacznie bliższe. MSE dla prognozowania metodą *sarima.for()* zdaje się być najmniejsze.   
-Intuicyjnie spodziewamy się, że dla kilku pierwszych prognoz otrzymamy najmniejsze MSE. Wykres sugeruje jednak, że to wartości środkowych prognoz są najlepsze. Dla skrajnych danych błędy każdej z metod były największe.   
-
-W tabeli widzimy sumę MSE dla każdej z metod. Najmniejszy błąd otrzymaliśmy dla funkcji *sarima.for*. Na tej podstawie uznajemy ją za najbardziej optymalną i używamy do wyznaczenia kolejnych prognoz. 
-
-
-```{r forecasts,echo = F,fig.align='center', out.width='80%'}
+```{r forecast_metodyestymacji,echo = F,fig.align='center', out.width='80%'}
 #model1 3 0 4
 # ts - dane od 2004 - 2023
 learning_set = window(ts1, start = c(2004,1), end=c(2021, 12))
@@ -391,8 +400,11 @@ lines(ses_vals, col = 'green', type='l')
 lines(hw_vals, col = 'magenta', type='l')
 lines(holt_vals, col = 'yellow', type='l')
 legend("left", legend=c("wartości szeregu", "sarima.for()", "forecast()", "ses()", "hw()", "holt()"),  fill = c("black", "red", "blue", "green", "magenta", "yellow"), bty="n")
+```
 
+Aby wybrać najdokładniejszą z metod porównamy błędy MSE dla wartości użytej funkcji oraz wartości zbioru testowego. Wyniki przedstawione są na wykresach:  
 
+```{r forecasts_mse,echo = F,fig.align='center', out.width='80%'}
 #bledy
 pred_mse = (pred_vals - test_set)**2
 forecast_mse = (forecast_vals - test_set)**2
@@ -403,25 +415,36 @@ holt_mse = (holt_vals - test_set)**2
 mse = data.frame(pred_mse, forecast_mse, ses_mse, hw_mse, holt_mse)
 colnames(mse) = c('sarima', 'forecast', 'ses', 'hw', 'holt')
 
-plot(indexes, mse$sarima, ylim = c(0,1000), type = 'l', col = 'red', main ='MSE predykcji dla stosowanych metod', xlim = c(-5, 24), ylab = 'Wartość MSE', xlab = 'Czas')
+par(mfrow=c(1,2))
+plot(indexes, mse$sarima, ylim = c(0,1000), type = 'l', col = 'red', main ='MSE predykcji', xlim = c(0, 24), ylab = 'Wartość MSE', xlab = 'Czas')
 lines(indexes, mse$forecast, col='blue')
 lines(indexes, mse$ses, col = 'green')
 lines(indexes, mse$hw, col = 'magenta')
 lines(indexes, mse$holt, col = 'yellow')
-legend("left", legend=c("sarima.for()", "forecast()", "ses()", "hw()", "holt()"),  fill = c("red", "blue", "green", "magenta", "yellow"), bty="n")
+legend("top", legend=c("sarima.for()", "forecast()", "ses()", "hw()", "holt()"),  fill = c("red", "blue", "green", "magenta", "yellow"), bty="n")
 
-plot(indexes, mse$sarima, ylim = c(0,250), type = 'l',col = 'red', main ='MSE predykcji dla stosowanych metod', xlim = c(-5, 24), ylab = 'Wartość MSE', xlab = 'Czas')
+plot(indexes, mse$sarima, ylim = c(0,250), type = 'l',col = 'red', main ='MSE predykcji', xlim = c(0, 24), ylab = 'Wartość MSE', xlab = 'Czas')
 lines(indexes, mse$forecast, col='blue')
 lines(indexes, mse$hw, col = 'magenta')
-legend("left", legend=c("sarima.for()", "forecast()", "hw()"),  fill = c("red", "blue", "magenta"), bty="n")
+legend("top", legend=c("sarima.for()", "forecast()", "hw()"),  fill = c("red", "blue", "magenta"), bty="n")
 
+```
+
+MSE dla metod *holt()* i *ses()* przyjmuje bardzo duże wartości. Błędy dla pozostałych modeli są znacznie mniejsze. MSE dla prognozowania metodą *sarima.for()* zdaje się być najbardziej optymalne.    
+Intuicyjnie spodziewamy się, że dla kilku pierwszych prognoz otrzymamy najmniejsze MSE. Wykres sugeruje jednak, że to wartości środkowych prognoz są najlepsze. Dla skrajnych danych błędy każdej z metod były największe.  
+
+```{r forecast_table, echo=F}
 sums = c(sum(pred_mse), sum(forecast_mse), sum(ses_mse), sum(hw_mse), sum(holt_mse))
 
-sum_df = data.frame(c('sarima', 'forecast', 'ses', 'hw', 'holt'), sums)
+sum_df = data.frame(c('sarima()', 'forecast()', 'ses()', 'hw()', 'holt()'), sums)
 colnames(sum_df) = c('Metoda prognozowania', 'MSE')
 
 kable(sum_df, caption="Łączne MSE dla każdej z metod predykcji" )
 ```
+
+W tabeli widzimy sumę MSE dla każdej z metod. Najmniejszy błąd otrzymaliśmy dla funkcji *sarima.for()*. Na tej podstawie uznajemy ją za najbardziej optymalną i używamy do wyznaczenia kolejnych prognoz. 
+
+
 
 ### Predykcja
 
@@ -462,6 +485,8 @@ plot(new_data, main = "Predykcja wartości szeregu na kolejne 2 lata", xlab = "C
 ```
 
 ## Model dla szeregu wygładzonego metodą regresji nielokalnej
+
+Dla regresji nielokalnej postępujemy analogicznie jak w przypadku opisanym powyżej.
 
 ### Porównanie metod predykcji 
 
@@ -515,24 +540,27 @@ holt_mse = (holt_vals - test_set)**2
 mse = data.frame(dates,pred_mse, forecast_mse, ses_mse, hw_mse, holt_mse)
 colnames(mse) = c('Date', 'sarima', 'forecast', 'ses', 'hw', 'holt')
 
-plot(indexes, mse$sarima, ylim = c(0,1000), type = 'l', col = 'red', main ='MSE predykcji dla stosowanych metod', xlim = c(-5, 24), ylab = 'Wartość MSE', xlab = 'Czas')
+par(mfrow=c(1,2))
+plot(indexes, mse$sarima, ylim = c(0,1000), type = 'l', col = 'red', main ='MSE predykcji', xlim = c(0, 24), ylab = 'Wartość MSE', xlab = 'Czas')
 lines(indexes, mse$forecast, col='blue')
 lines(indexes, mse$ses, col = 'green')
 lines(indexes, mse$hw, col = 'magenta')
 lines(indexes, mse$holt, col = 'yellow')
-legend("left", legend=c("sarima.for()", "forecast()", "ses()", "hw()", "holt()"),  fill = c("red", "blue", "green", "magenta", "yellow"), bty="n")
+legend("top", legend=c("sarima.for()", "forecast()", "ses()", "hw()", "holt()"),  fill = c("red", "blue", "green", "magenta", "yellow"), bty="n")
 
-plot(indexes, mse$sarima, ylim = c(0,250), type = 'l',col = 'red', main ='MSE predykcji dla stosowanych metod', xlim = c(-5, 24), ylab = 'Wartość MSE', xlab = 'Czas')
+plot(indexes, mse$sarima, ylim = c(0,250), type = 'l',col = 'red', main ='MSE predykcji', xlim = c(0, 24), ylab = 'Wartość MSE', xlab = 'Czas')
 lines(indexes, mse$hw, col = 'magenta')
-legend("left", legend=c("sarima.for()","hw()"),  fill = c("red", "magenta"), bty="n")
+legend("top", legend=c("sarima.for()","hw()"),  fill = c("red", "magenta"), bty="n")
 
 sums = c(sum(pred_mse), sum(forecast_mse), sum(ses_mse), sum(hw_mse), sum(holt_mse))
 
-sum_df1 = data.frame(c('sarima', 'forecast', 'ses', 'hw', 'holt'), sums)
+sum_df1 = data.frame(c('sarima()', 'forecast()', 'ses()', 'hw()', 'holt()'), sums)
 colnames(sum_df1) = c('Metoda prognozowania', 'MSE')
 
 kable(sum_df1, caption="Łączne MSE dla każdej z metod predykcji" )
 ```
+
+Funkcja *sarima.for()* minimalizuje MSE także dla szeregu wygładzonego metodą regresji nielokalnej. Zauważmy, że w tym przypaku MSE wynosi $354.1691$ i jest znacznie mniejsze niż dla szeregu bez wygładzania (MSE = $672.4980$). Metody *ses()* oraz *holt()* także wypadły lepiej. Funkcja $hw()$ w obu przypadkach zwróciła niemal identyczne wartości. Oznacza to, że dla wygładzonego szeregu łatwiej jest dokonać predykcji. 
 
 ### Predykcja
 
@@ -568,29 +596,12 @@ new_data1 = new_trend+dataset2 + new_season
 plot(new_data1, main = "Predykcja wartości szeregu na kolejne 2 lata", xlab = "Czas", ylab = "Wartość")
 ```
 
-## Porównanie szeregów
+
+## Porównanie metod predykcji
+
+Porównajmy teraz wyniki predykcji otrzymane dwiema metodami. Widzimy, że wykresy obu szeregów czasowych są do siebie podobne, co może świadczyć o dobrych wartościach predykatorów. Różnice zauważalne są jedynie przy wartościach odstających, co zapewne spowodowane jest wygładzaniem szeregu. 
 
 ```{r porownanie,echo = F, fig.align='center', out.width='80%'}
-plot(time_series, main = 'Wygładzanie szeregu metodą regresji nielokalnej', xlab = 'Czas', ylab = 'Wartość')
-lines(ts_filter, col = 'red')
-legend("topleft", legend=c("Szereg czasowy", "Wygładzony szereg czasowy"),  
-       fill = c("black","red"), bty="n")
-
-
-par(mfrow=c(1,2))
-plot(time_series, ylim = c(0,100),main = 'Szereg czasowy', xlab = 'Czas', ylab = 'Wartość')
-lines(trend_poly_vals, col ='darkred', lwd = 2)
-lines(fitted.values(tslm(dane1 ~ season))+30, col ='red', lwd = 1)
-legend("topleft", legend=c("Sezonowość", "Trend"),  
-       fill = c("red", "darkred"), bty="n")
-
-plot(ts_filter, ylim = c(0,100),main = "Wygładzony szereg czasowy", xlab = 'Czas', ylab = 'Wartość')
-lines(trend_filter,col ='darkred', lwd = 2)
-lines(fitted.values(tslm(dane5 ~ season))+30, col ='red', lwd = 1)
-legend("topleft", legend=c("Sezonowość", "Trend"),  
-       fill = c("red", "darkred"), bty="n")
-
-
 par(mfrow=c(1,1))
 plot(new_data, main = 'Prognozowanie wartości', xlab = 'Czas', ylab = 'Wartość')
 lines(new_data1, col = 'red')
@@ -598,4 +609,16 @@ legend("topleft", legend=c("Szereg czasowy", "Wygładzony szereg czasowy"),
        fill = c("black","red"), bty="n")
 ```
 
+Z wykresu można wnioskować, że sezonowość utrzyma się na tym samym poziomie. Nastąpi jednak lekkie wygładzenie trendu. Ogólna popularność rowerów nie spadnie ale też nie nastąpi znaczący wzrost. 
+
 # Wnioski
+
+## Wnioski statystyczne 
+
+1. Przed właściwym modelowaniem szeregu czasowego należy nabrać intuicji na temat danych.
+Za pomocą prostych wykresów dobrze jest sprawdzić istnienie trendu, sezonowości oraz kompletność danych. 
+2. Przed dobraniem modelu można rozważyć także wygładzenie szeregu np. metodą średniej ruchomej, czy regresji wielorakiej. 
+3. Istnieje wiele sposobów modelowania szeregu. Zadaniem statystyka jest dobrać ten, który najlepiej oddaje zachowanie danych. Ważne jest aby dobrany model był optymalny i łatwy do analizy. Dokładność doboru można badać przykładowo dzięki wskaźnikom: R kwadrat, AIC i BIC.  
+4. Przed dokonaniem predykcji dobrze jest sprawdzić, która z metod prognozowania jest najlepsza dla analizowanego szeregu. Przykładowo można to zrobić dzieląc dane na zbiór treningowy i zbiór testowy. Przez prognozowanie na podstawie zbioru treningowego i porównanie wyników ze zbiorem testowym dowiadujemy się, jakie błędy popełniamy. 
+
+## Wnioski biznesowe
