@@ -48,7 +48,7 @@ Dokonamy teraz ogólnego przeglądu danych, w celu wyrobienia początkowej intui
 plot(time_series, main = 'Zainteresowanie rowerami w województwie dolnośląskim', xlab ='Czas', ylab= 'Ilość wyszukań')
 
 # Wartości dla kolejnych miesiecy
-boxplot(time_series~cycle(time_series), xlab="Data", ylab = "Ilość wyszukań", main = "Boxplot popularności rowerów w zależności od miesiąca")
+boxplot(time_series~cycle(time_series), xlab="Miesiąc", ylab = "Ilość wyszukań", main = "Boxplot popularności rowerów w zależności od miesiąca")
 
 # Suma dla poszczegolnych lat
 years = data.frame(substring(df$Date,1,4), df$Number)
